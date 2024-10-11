@@ -1,7 +1,0 @@
-.mypy_cache/
-__pycache__
-.git
-numpy_test.py
-play_game.py
-test.py
-.gitignore
