@@ -18,18 +18,22 @@ class Agent:
         self.memory = memory
         self.device: torch.device = device
 
-        self.network = (
-            network.PPO_Network(input_size, actions).to(self.device).to(torch.float64)
+        self.actor = (
+            network.Actor(input_size, actions).to(self.device).to(torch.float64)
         )
-        self.optimizer = torch.optim.Adam(self.network.parameters(), lr=lr)
-
+        self.critic = (
+            network.Critic(input_size, actions).to(self.device).to(torch.float64)
+        )
+        self.actor_optimizer = torch.optim.Adam(self.actor.parameters(), lr=lr)
+        self.critic_optimizer = torch.optim.Adam(self.critic.parameters(), lr=lr)
         self.mini_batch_size = mini_batch_size
         self.epochs = epochs
         self.epsilon = epsilon
         self.MSELoss = torch.nn.MSELoss()
 
     def get_action(self, obs_state: torch.Tensor):
-        value, dist = self.network(obs_state)
+        dist = self.actor(obs_state)
+        value = self.critic(obs_state)
         action = dist.sample()
         return value, action.item(), dist.log_prob(action)
 
@@ -51,7 +55,8 @@ class Agent:
                 ], returns[rand_idx], advantages[rand_idx]
 
     def train(self):
-        loss_val = 0
+        actor_loss_val = 0
+        critic_loss_val = 0
         for i in range(self.epochs):
             l = 0
             for (
@@ -61,7 +66,8 @@ class Agent:
                 return_,
                 advantage,
             ) in self.get_minibatch():
-                value, dist = self.network(state)
+                dist = self.actor(state)
+                value = self.critic(state)
                 new_log_probs = dist.log_prob(action)
                 entropy = dist.entropy().mean()
                 ratio = (new_log_probs - old_log_probs).exp()
@@ -77,10 +83,14 @@ class Agent:
                 #    print(f"actor loss: {actor_loss}")
                 #    print(f"critic_loss: {critic_loss}")
                 #    print(f"entropy: {entropy}")
-                loss = 0.5 * critic_loss + actor_loss - 0.1 * entropy
-                self.optimizer.zero_grad()
-                loss.backward()
-                self.optimizer.step()
-                loss_val += loss.item()
+                actor_loss = actor_loss - 0.1 * entropy
+                self.actor_optimizer.zero_grad()
+                self.critic_optimizer.zero_grad()
+                actor_loss.backward()
+                critic_loss.backward()
+                self.actor_optimizer.step()
+                self.critic_optimizer.step()
+                actor_loss_val += actor_loss.item()
+                critic_loss_val += critic_loss.item()
                 l += 1
-        return loss_val / self.epochs
+        return actor_loss_val / self.epochs, critic_loss_val / self.epochs
