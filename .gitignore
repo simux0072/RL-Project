@@ -4,3 +4,4 @@ __pycache__
 numpy_test.py
 play_game.py
 test.py
+.gitignore
