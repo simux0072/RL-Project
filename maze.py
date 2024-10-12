@@ -38,7 +38,7 @@ class Maze:
     def check_goal(self):
         if not self.sub_goal_reached and (self.goals[0] == self.player_pos).all():
             self.sub_goal_reached = True
-            return 1, False  # Reward: int, end of episode: bool
+            return 5, False  # Reward: int, end of episode: bool
         elif self.sub_goal_reached and (self.goals[1] == self.player_pos).all():
             return 10, True
         else:

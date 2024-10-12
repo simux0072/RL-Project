@@ -7,17 +7,17 @@ import time
 
 input_size = 10 * 10
 actions = 4
-lr = 0.0005
+lr = 0.001
 epochs = 16
-minibatch_size = 64
+minibatch_size = 32
 epsilon = 0.2
 
-gamma = 0.9
-lambda_ = 0.9
+gamma = 0.1
+lambda_ = 0.95
 
 memory_size = 100000
 
-games_per_epochs = 8
+games_per_epochs = 16
 
 device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 memory_buf = Memory(memory_size)

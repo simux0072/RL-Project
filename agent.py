@@ -77,13 +77,6 @@ class Agent:
                 )
                 actor_loss = -torch.min(surr_1, surr_2).mean()
                 critic_loss = self.MSELoss(return_, value)
-                # if critic_loss >= 10 or actor_loss >= 10:
-                #    print(f"returns: {return_.shape}")
-                #    print(f"advantages: {advantage}")
-                #    print(f"actor loss: {actor_loss}")
-                #    print(f"critic_loss: {critic_loss}")
-                #    print(f"entropy: {entropy}")
-                actor_loss = actor_loss - 0.1 * entropy
                 self.actor_optimizer.zero_grad()
                 self.critic_optimizer.zero_grad()
                 actor_loss.backward()
@@ -93,4 +86,7 @@ class Agent:
                 actor_loss_val += actor_loss.item()
                 critic_loss_val += critic_loss.item()
                 l += 1
-        return actor_loss_val / self.epochs, critic_loss_val / self.epochs
+        return (
+            actor_loss_val / self.epochs / self.mini_batch_size,
+            critic_loss_val / self.epochs / self.mini_batch_size,
+        )

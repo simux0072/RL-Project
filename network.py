@@ -15,7 +15,6 @@ class Actor(torch.nn.Module):
             torch.nn.BatchNorm2d(3),
             torch.nn.Conv2d(3, 6, kernel_size=2),
             torch.nn.ReLU(),
-            torch.nn.BatchNorm2d(6),
             torch.nn.Conv2d(6, 6, kernel_size=1),
             torch.nn.Flatten(start_dim=1),
             torch.nn.ReLU(),
@@ -44,19 +43,14 @@ class Critic(torch.nn.Module):
             torch.nn.BatchNorm2d(3),
             torch.nn.Conv2d(3, 6, kernel_size=2),
             torch.nn.ReLU(),
-            torch.nn.BatchNorm2d(6),
             torch.nn.Conv2d(6, 6, kernel_size=1),
             torch.nn.Flatten(start_dim=1),
             torch.nn.ReLU(),
             torch.nn.Linear(294, 128),
             torch.nn.ReLU(),
-            torch.nn.Linear(128, 128),
-            torch.nn.ReLU(),
             torch.nn.Linear(128, 64),
             torch.nn.ReLU(),
-            torch.nn.Linear(64, 32),
-            torch.nn.ReLU(),
-            torch.nn.Linear(32, 1),
+            torch.nn.Linear(64, 1),
         )
 
     def forward(self, obs_input: torch.Tensor):
