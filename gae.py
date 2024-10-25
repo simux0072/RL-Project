@@ -11,6 +11,4 @@ def GAE(ends, rewards, values, gamma, lambda_):
         returns.insert(0, gae + values[i])
     returns = torch.tensor(returns)
     advantages = returns - values[:-1]
-    return returns, (advantages - torch.mean(advantages)) / (
-        torch.std(advantages) + 1e-10
-    )
+    return returns, advantages
